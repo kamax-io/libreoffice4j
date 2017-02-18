@@ -26,8 +26,14 @@ public interface ICell {
 
     void setValueRaw(Object value);
 
+    void setValueRaw(String value);
+
     void setValue(Object value);
 
+    void setValue(String value);
+
     void setValue(Double value);
+
+    String getValue();
 
 }

@@ -22,8 +22,15 @@
 
 package io.kamax.libreoffice4j.table;
 
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.sheet.XSpreadsheet;
+import com.sun.star.table.XColumnRowRange;
+import com.sun.star.uno.UnoRuntime;
 import io.kamax.libreoffice4j.exception.IndexOutOfBoundsException;
+import io.kamax.libreoffice4j.exception.LibreOfficeException;
 
 public class Row implements IRow {
 
@@ -35,11 +42,34 @@ public class Row implements IRow {
         this.index = index;
     }
 
+    @Override
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
     public Cell getCell(int col) {
         try {
             return new Cell(sheet.getCellByPosition(col, index));
         } catch (com.sun.star.lang.IndexOutOfBoundsException e) {
             throw new IndexOutOfBoundsException(col, index);
+        }
+    }
+
+    @Override
+    public void setPageBreak(boolean isPageBreak) {
+        try {
+            XColumnRowRange tableRows = UnoRuntime.queryInterface(XColumnRowRange.class, sheet);
+            XPropertySet tableRow = UnoRuntime.queryInterface(XPropertySet.class, tableRows.getRows().getByIndex(index));
+            tableRow.setPropertyValue("IsStartOfNewPage", true);
+        } catch (com.sun.star.lang.IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException(0, index);
+        } catch (WrappedTargetException e) {
+            throw new LibreOfficeException(e);
+        } catch (PropertyVetoException e) {
+            throw new LibreOfficeException(e);
+        } catch (UnknownPropertyException e) {
+            throw new LibreOfficeException(e);
         }
     }
 

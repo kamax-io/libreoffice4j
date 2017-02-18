@@ -32,16 +32,42 @@ public class Cell implements ICell {
         this.cell = cell;
     }
 
+    @Override
     public void setValueRaw(Object value) {
-        setValue("=\"" + value.toString() + "\"");
+        if (value != null) {
+            setValue("=\"" + value.toString() + "\"");
+        } else {
+            setValue((String) null);
+        }
     }
 
+    @Override
+    public void setValueRaw(String value) {
+        setValue("=\"" + value + "\"");
+    }
+
+    @Override
     public void setValue(Object value) {
-        cell.setFormula(value.toString());
+        if (value != null) {
+            setValue(value.toString());
+        } else {
+            setValue((String) null);
+        }
     }
 
+    @Override
+    public void setValue(String value) {
+        cell.setFormula(value);
+    }
+
+    @Override
     public void setValue(Double value) {
         cell.setValue(value);
+    }
+
+    @Override
+    public String getValue() {
+        return cell.getFormula();
     }
 
 }

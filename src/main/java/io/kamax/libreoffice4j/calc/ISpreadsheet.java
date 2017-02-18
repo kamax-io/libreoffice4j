@@ -22,13 +22,20 @@
 
 package io.kamax.libreoffice4j.calc;
 
-import io.kamax.libreoffice4j.table.Cell;
-import io.kamax.libreoffice4j.table.RowSerie;
+import io.kamax.libreoffice4j.table.ICell;
+import io.kamax.libreoffice4j.table.IRow;
+import io.kamax.libreoffice4j.table.IRowSerie;
 
 public interface ISpreadsheet {
 
-    Cell getCell(int col, int row);
+    ICell getCell(int col, int row);
 
-    RowSerie getRowSeries(int startIndex);
+    IRow getRow(int row);
+
+    IRowSerie getRowSeries(int startIndex);
+
+    void insertRowAboveAndCopy(int row);
+
+    void copyCellRangeToPosition(String sourceRange, String destinationCell);
 
 }

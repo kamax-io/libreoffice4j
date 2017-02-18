@@ -22,9 +22,15 @@
 
 package io.kamax.libreoffice4j.calc;
 
-import com.sun.star.lang.IndexOutOfBoundsException;
-import com.sun.star.sheet.XSpreadsheet;
+import com.sun.star.sheet.*;
+import com.sun.star.table.CellAddress;
+import com.sun.star.table.CellRangeAddress;
+import com.sun.star.table.XCellRange;
+import com.sun.star.uno.UnoRuntime;
+import io.kamax.libreoffice4j.exception.IndexOutOfBoundsException;
 import io.kamax.libreoffice4j.table.Cell;
+import io.kamax.libreoffice4j.table.IRow;
+import io.kamax.libreoffice4j.table.Row;
 import io.kamax.libreoffice4j.table.RowSerie;
 
 public class Spreadsheet implements ISpreadsheet {
@@ -38,13 +44,47 @@ public class Spreadsheet implements ISpreadsheet {
     public Cell getCell(int col, int row) {
         try {
             return new Cell(sheet.getCellByPosition(col, row));
-        } catch (IndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException(col + ":" + row);
+        } catch (com.sun.star.lang.IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException(col, row);
         }
+    }
+
+    public IRow getRow(int row) {
+        return new Row(row, sheet);
     }
 
     public RowSerie getRowSeries(int startIndex) {
         return new RowSerie(startIndex, sheet);
+    }
+
+    protected CellRangeAddress getRowAddress(int row) {
+        try {
+            return UnoRuntime.queryInterface(XCellRangeAddressable.class, sheet.getCellRangeByPosition(0, row, 150, row)).getRangeAddress();
+        } catch (com.sun.star.lang.IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException(0, row);
+        }
+    }
+
+    protected CellAddress getCellAddress(XSpreadsheet sheet, int column, int row) {
+        try {
+            return UnoRuntime.queryInterface(XCellAddressable.class, sheet.getCellByPosition(column, row)).getCellAddress();
+        } catch (com.sun.star.lang.IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException(column, row);
+        }
+    }
+
+    public void insertRowAboveAndCopy(int row) {
+        XCellRangeMovement mover = UnoRuntime.queryInterface(XCellRangeMovement.class, sheet);
+        mover.insertCells(getRowAddress(row), CellInsertMode.ROWS);
+        mover.copyRange(getCellAddress(sheet, 0, row), getRowAddress(row - 1));
+    }
+
+    @Override
+    public void copyCellRangeToPosition(String sourceRange, String destinationCell) {
+        XCellRange oRange = UnoRuntime.queryInterface(XCellRange.class, sheet).getCellRangeByName(sourceRange);
+        CellAddress destAddress = UnoRuntime.queryInterface(XCellAddressable.class, sheet.getCellRangeByName(destinationCell)).getCellAddress();
+        CellRangeAddress rangeAddres = UnoRuntime.queryInterface(XCellRangeAddressable.class, oRange).getRangeAddress();
+        UnoRuntime.queryInterface(XCellRangeMovement.class, sheet).copyRange(destAddress, rangeAddres);
     }
 
 }

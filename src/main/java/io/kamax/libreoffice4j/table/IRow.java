@@ -24,6 +24,10 @@ package io.kamax.libreoffice4j.table;
 
 public interface IRow {
 
+    int getIndex();
+
     ICell getCell(int column);
+
+    void setPageBreak(boolean isPageBreak);
 
 }

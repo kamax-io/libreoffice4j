@@ -71,12 +71,12 @@ public class LibreOfficeManager {
         this.xCLoader = xCLoader;
     }
 
-    public SpreadsheetDocument loadSpreadsheetDocument(File file) {
+    public SpreadsheetDocument loadSpreadsheetDocument(File file, boolean visible) {
         try {
             PropertyValue[] props = new PropertyValue[1];
             props[0] = new PropertyValue();
             props[0].Name = "Hidden";
-            props[0].Value = true;
+            props[0].Value = !visible;
 
             XComponent xComp = xCLoader.loadComponentFromURL("file://" + file.getAbsolutePath(), "_blank", 0, props);
             XSpreadsheetDocument doc = UnoRuntime.queryInterface(XSpreadsheetDocument.class, xComp);
@@ -84,7 +84,7 @@ public class LibreOfficeManager {
             return new SpreadsheetDocument(doc);
         } catch (DisposedException e) {
             xCLoader = initContext();
-            return loadSpreadsheetDocument(file);
+            return loadSpreadsheetDocument(file, visible);
         } catch (IOException e) {
             throw new LibreOfficeException(e);
         }
