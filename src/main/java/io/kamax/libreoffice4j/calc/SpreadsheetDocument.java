@@ -33,6 +33,7 @@ import com.sun.star.sheet.XSpreadsheetDocument;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.CloseVetoException;
 import com.sun.star.util.XCloseable;
+import com.sun.star.view.XPrintable;
 import io.kamax.libreoffice4j.exception.LibreOfficeException;
 
 import java.io.File;
@@ -57,6 +58,33 @@ public class SpreadsheetDocument implements ISpreadsheetDocument {
         } catch (CloseVetoException e) {
             throw new LibreOfficeException(e);
         }
+    }
+
+    public void print() {
+        print(1);
+    }
+
+    public void print(int amount) {
+        print(null, 1);
+    }
+
+    public void print(String printerName, int amount) {
+        XPrintable xPrintable = UnoRuntime.queryInterface(com.sun.star.view.XPrintable.class, doc);
+
+        if (printerName != null) {
+            PropertyValue[] printerProps = new PropertyValue[1];
+            printerProps[0] = new PropertyValue();
+            printerProps[0].Name = "Name";
+            printerProps[0].Value = printerName;
+            xPrintable.setPrinter(printerProps);
+        }
+
+        PropertyValue[] printJobProps = new PropertyValue[1];
+        printJobProps[0] = new PropertyValue();
+        printJobProps[0].Name = "CopyCount";
+        printJobProps[0].Value = amount;
+
+        xPrintable.print(printJobProps);
     }
 
     public Spreadsheet getSpreadsheet(int index) {

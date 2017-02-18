@@ -32,4 +32,10 @@ public interface ISpreadsheetDocument {
 
     void close();
 
+    void print();
+
+    void print(int amount);
+
+    void print(String printerName, int amount);
+
 }
