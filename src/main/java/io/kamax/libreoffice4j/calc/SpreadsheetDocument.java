@@ -64,11 +64,15 @@ public class SpreadsheetDocument implements ISpreadsheetDocument {
         print(1);
     }
 
-    public void print(int amount) {
-        print(null, 1);
+    public void print(boolean blocking) {
+        print(null, 1, blocking);
     }
 
-    public void print(String printerName, int amount) {
+    public void print(int amount) {
+        print(null, 1, false);
+    }
+
+    public void print(String printerName, int amount, boolean blocking) {
         XPrintable xPrintable = UnoRuntime.queryInterface(com.sun.star.view.XPrintable.class, doc);
 
         if (printerName != null) {
@@ -79,10 +83,14 @@ public class SpreadsheetDocument implements ISpreadsheetDocument {
             xPrintable.setPrinter(printerProps);
         }
 
-        PropertyValue[] printJobProps = new PropertyValue[1];
+        PropertyValue[] printJobProps = new PropertyValue[2];
         printJobProps[0] = new PropertyValue();
         printJobProps[0].Name = "CopyCount";
         printJobProps[0].Value = amount;
+
+        printJobProps[1] = new PropertyValue();
+        printJobProps[1].Name = "Wait";
+        printJobProps[1].Value = blocking;
 
         xPrintable.print(printJobProps);
     }

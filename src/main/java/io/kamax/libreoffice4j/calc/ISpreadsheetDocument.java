@@ -34,8 +34,10 @@ public interface ISpreadsheetDocument {
 
     void print();
 
+    void print(boolean blocking);
+
     void print(int amount);
 
-    void print(String printerName, int amount);
+    void print(String printerName, int amount, boolean blocking);
 
 }
